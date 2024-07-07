@@ -147,6 +147,14 @@ class Data2VecMultiConfig(FairseqDataclass):
     decoder_group: bool = False
     compile_transformer: bool = False
 
+def compile_model(model, dynamic: bool = True):
+    """Apply :func:`torch.compile` to ``model``."""
+    logger.info("Applying `torch.compile()` to the model.")
+
+    return torch.compile(  # type: ignore[return-value]
+        model, dynamic=dynamic, options={"shape_padding": dynamic}
+    )
+
 @register_model("data2vec_multi", dataclass=Data2VecMultiConfig)
 class Data2VecMultiModel(BaseFairseqModel):
     def make_modality_encoder(
