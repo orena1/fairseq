@@ -145,7 +145,7 @@ class Data2VecMultiConfig(FairseqDataclass):
     d2v_loss: float = 1
 
     decoder_group: bool = False
-
+    compile_transformer: bool = False
 
 @register_model("data2vec_multi", dataclass=Data2VecMultiConfig)
 class Data2VecMultiModel(BaseFairseqModel):
@@ -267,6 +267,9 @@ class Data2VecMultiModel(BaseFairseqModel):
             if cfg.decoder_group and "decoder" in pn:
                 p.param_group = "decoder"
 
+        if getattr(cfg,'compile_transformer',False):
+            self.blocks = nn.ModuleList([compile_model(i) for i in self.blocks])
+        
         self.num_updates = 0
 
     def _init_weights(self, m):
